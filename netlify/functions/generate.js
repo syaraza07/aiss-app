@@ -1,9 +1,30 @@
-exports.handler = async (event) => {
+exports.handler = async function (event) {
   try {
-    const { text } = JSON.parse(event.body);
+    const body = JSON.parse(event.body || "{}");
+    const text = body.text || "";
+
+    if (!text) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          result: "Teks narasi belum tersedia."
+        })
+      };
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          result: "GEMINI_API_KEY belum terbaca di Netlify."
+        })
+      };
+    }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey,
       {
         method: "POST",
         headers: {
@@ -14,9 +35,9 @@ exports.handler = async (event) => {
             {
               parts: [
                 {
-                  text: `Ubah narasi berikut menjadi prompt video AI yang menarik dalam bahasa Inggris:
-
-${text}`
+                  text:
+                    "Ubah narasi berikut menjadi prompt video AI berbahasa Inggris, singkat, visual, dan menarik. Output hanya prompt saja:\n\n" +
+                    text
                 }
               ]
             }
@@ -27,19 +48,21 @@ ${text}`
 
     const data = await response.json();
 
+    const result =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data.error?.message ||
+      "Gemini tidak mengembalikan hasil.";
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ result })
+    };
+  } catch (error) {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        result:
-          data.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "Tidak ada hasil"
+        result: "Error: " + error.message
       })
     };
-  catch (error) {
-  return {
-    statusCode: 500,
-    body: JSON.stringify({
-      result: error.message
-    })
-  };
+  }
 };
