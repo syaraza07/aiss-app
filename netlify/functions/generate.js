@@ -7,19 +7,21 @@ export async function handler(event) {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           contents: [
             {
               parts: [
                 {
-                  text: `Ubah narasi berikut menjadi prompt video AI yang menarik dalam bahasa Inggris:\n\n${text}`,
-                },
-              ],
-            },
-          ],
-        }),
+                  text: `Ubah narasi berikut menjadi prompt video AI yang menarik dalam bahasa Inggris:
+
+${text}`
+                }
+              ]
+            }
+          ]
+        })
       }
     );
 
@@ -30,15 +32,15 @@ export async function handler(event) {
       body: JSON.stringify({
         result:
           data.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "Tidak ada hasil",
-      }),
+          "Tidak ada hasil"
+      })
     };
   } catch (error) {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        result: "Terjadi kesalahan saat menghubungi Gemini",
-      }),
+        result: "Terjadi kesalahan saat menghubungi Gemini"
+      })
     };
   }
 }
