@@ -53,21 +53,15 @@ export default function AISSApp() {
     setLoading(p => ({ ...p, [scene]: true }));
     setAiResponse(p => ({ ...p, [scene]: "" }));
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: `Kamu adalah asisten belajar yang membantu siswa SD kelas 4-6 membuat prompt untuk AI video generator (seperti Canva AI). 
-Tugas kamu: ubah teks narasi Bahasa Indonesia menjadi prompt bahasa Inggris yang singkat, deskriptif, dan visual.
-Format output HANYA berupa prompt (maksimal 2-3 kalimat, sekitar 30-50 kata).
-Gunakan kata-kata yang visual dan deskriptif: tokoh, latar, aksi, suasana, gaya visual.
-Contoh format: "A dignified Indonesian man in white shirt reading a proclamation, 1945 era, surrounded by an emotional crowd, morning light, sepia tone, historical atmosphere"
-PENTING: Output HANYA prompt saja, tanpa penjelasan, tanpa kata pembuka.`,
-          messages: [{ role: "user", content: `Ubah narasi ini menjadi prompt AI video generator:\n\n${text}\n\nKonteks topik: ${topic?.label || "Sejarah Indonesia"}\nTokoh/latar: ${story.characters}, ${story.setting}` }]
-        })
-      });
+     const res = await fetch("/.netlify/functions/generate", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    text
+  })
+});
       const data = await res.json();
       const result = data.content?.[0]?.text || "";
       setAiResponse(p => ({ ...p, [scene]: result }));
