@@ -1,4 +1,4 @@
-export async function handler(event) {
+exports.handler = async (event) => {
   try {
     const { text } = JSON.parse(event.body);
 
@@ -42,4 +42,4 @@ ${text}`
       result: error.message
     })
   };
-}
+};
