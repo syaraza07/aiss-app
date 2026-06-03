@@ -35,12 +35,11 @@ ${text}`
           "Tidak ada hasil"
       })
     };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        result: "Terjadi kesalahan saat menghubungi Gemini"
-      })
-    };
-  }
+  catch (error) {
+  return {
+    statusCode: 500,
+    body: JSON.stringify({
+      result: error.message
+    })
+  };
 }
